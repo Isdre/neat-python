@@ -4,7 +4,6 @@ from random import random
 
 from neat.attributes import FloatAttribute, BoolAttribute, StringAttribute
 
-
 # TODO: There is probably a lot of room for simplification of these classes using metaprogramming.
 # TODO: Evaluate using __slots__ for performance/memory usage improvement.
 
@@ -75,7 +74,12 @@ class BaseGene(object):
             if random() > 0.5:
                 setattr(new_gene, a.name, getattr(self, a.name))
             else:
-                setattr(new_gene, a.name, getattr(gene2, a.name))
+                try:
+                    setattr(new_gene, a.name, getattr(gene2, a.name))
+                except AttributeError:
+                    warnings.warn(f"Attribute {a.name!r} not found in {gene2!r}, skipping crossover for this attribute.")
+                    setattr(new_gene, a.name, getattr(self, a.name))
+                    continue
 
         return new_gene
 
